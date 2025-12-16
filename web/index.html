@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WordleAssist Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>WordleAssist</h1>
+      <p>Client-side helper using your original algorithm.</p>
+    </header>
+
+    <main>
+      <section class="status">
+        <div id="statusText">Loading dictionary…</div>
+        <div id="remainingCount"></div>
+      </section>
+
+      <section class="guess-section">
+        <button id="nextGuessBtn" disabled>Get next guess</button>
+        <div id="guessWord" class="guess-word"></div>
+      </section>
+
+      <section class="feedback-section" aria-label="Feedback for current guess">
+        <h2>Enter feedback</h2>
+        <p>
+          For each letter, choose:
+          <strong>X</strong> = Not in word,
+          <strong>C</strong> = Correct position,
+          <strong>I</strong> = In word, wrong position.
+        </p>
+        <div id="feedbackGrid" class="feedback-grid"></div>
+        <button id="applyFeedbackBtn" disabled>Apply feedback</button>
+      </section>
+
+      <section class="candidates">
+        <h2>Remaining candidates</h2>
+        <div id="candidatesList" class="candidates-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="solver.js"></script>
+</body>
+</html>

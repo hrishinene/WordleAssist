@@ -1,0 +1,232 @@
+:root {
+  --bg: #060713;
+  --bg-alt: #131521;
+  --accent: #4ade80;
+  --accent-soft: rgba(74, 222, 128, 0.15);
+  --text: #f9fafb;
+  --muted: #9ca3af;
+  --danger: #f97373;
+  --border: #1f2933;
+  --tile-bg: #111827;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #1f2937, #020617 55%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 960px;
+  padding: 24px 16px 40px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+section {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7));
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 16px 18px 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+}
+
+section h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.status {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+#statusText {
+  font-size: 0.95rem;
+}
+
+#remainingCount {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.guess-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #022c22;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+  transition: transform 0.05s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(74, 222, 128, 0.5);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 6px 15px rgba(74, 222, 128, 0.35);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.guess-word {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--tile-bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95);
+}
+
+.feedback-section p {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.feedback-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.feedback-letter {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--tile-bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.feedback-btn {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--muted);
+  box-shadow: none;
+  border: 1px solid transparent;
+}
+
+.feedback-btn.selected-X {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.feedback-btn.selected-C {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.feedback-btn.selected-I {
+  background: rgba(251, 191, 36, 0.14);
+  border-color: #fbbf24;
+  color: #facc15;
+}
+
+.candidates-list {
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 4px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.candidates-list span {
+  display: inline-block;
+  padding: 3px 6px;
+  margin: 1px 3px 2px 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(55, 65, 81, 0.85);
+}

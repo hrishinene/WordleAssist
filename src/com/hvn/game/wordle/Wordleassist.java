@@ -1,9 +1,10 @@
 package com.hvn.game.wordle;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Wordleassist {
-	public static final String Wordfile = "/home/hrishi/hrishi/work/projects/mini_projects/wordie/resources/all.txt";
+	public static final String Wordfile = Paths.get("dictionary5.txt").toAbsolutePath().toString();
 	
 	public static class CharBasedEliminator implements WordReducerPredicate {
 		char ch;
@@ -139,11 +140,14 @@ public class Wordleassist {
 		System.out.println("https://www.powerlanguage.co.uk/wordle/");
 		System.out.println("----");
 		
-		if (args == null || args.length == 0) {
-			System.out.println("Please provide path to Words Dictionary! ");
-			return;
+		String dictionaryPath = Wordfile;
+		if (args != null && args.length > 0) {
+			dictionaryPath = args[0];
+			System.out.println("Using provided dictionary: " + dictionaryPath);
+		} else {
+			System.out.println("No dictionary argument supplied. Using default: " + dictionaryPath);
 		}
-		
-		playWordie2(args[0]);
+
+		playWordie2(dictionaryPath);
 	}
 }
