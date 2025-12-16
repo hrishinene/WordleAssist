@@ -10,7 +10,7 @@
   <div class="app">
     <header>
       <h1>WordleAssist</h1>
-      <p>Client-side helper using your original algorithm.</p>
+      <p>Wordle helper running entirely in your browser.</p>
     </header>
 
     <main>
@@ -20,7 +20,23 @@
       </section>
 
       <section class="guess-section">
-        <button id="nextGuessBtn" disabled>Get next guess</button>
+        <div class="guess-controls">
+          <button id="nextGuessBtn" disabled>Get next guess</button>
+          <div class="manual-guess">
+            <label for="manualGuessInput">or type your guess:</label>
+            <div class="manual-guess-row">
+              <input
+                id="manualGuessInput"
+                maxlength="5"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+                placeholder="e.g. crane"
+              />
+              <button id="useManualGuessBtn" type="button">Use</button>
+            </div>
+          </div>
+        </div>
         <div id="guessWord" class="guess-word"></div>
       </section>
 

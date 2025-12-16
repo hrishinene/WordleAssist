@@ -95,6 +95,39 @@ section h2 {
   gap: 12px;
 }
 
+.guess-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.manual-guess {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.manual-guess-row {
+  margin-top: 4px;
+  display: flex;
+  gap: 6px;
+}
+
+.manual-guess-row input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.manual-guess-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.5);
+}
+
 button {
   border: none;
   border-radius: 999px;
@@ -151,6 +184,12 @@ button:disabled {
   margin-bottom: 8px;
   font-size: 0.86rem;
   color: var(--muted);
+}
+
+.feedback-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .feedback-grid {

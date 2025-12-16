@@ -221,6 +221,8 @@ const guessWordEl = document.getElementById("guessWord");
 const feedbackGrid = document.getElementById("feedbackGrid");
 const applyFeedbackBtn = document.getElementById("applyFeedbackBtn");
 const candidatesListEl = document.getElementById("candidatesList");
+const manualGuessInput = document.getElementById("manualGuessInput");
+const useManualGuessBtn = document.getElementById("useManualGuessBtn");
 
 let bank = null;
 let processor = null;
@@ -330,6 +332,9 @@ async function loadDictionary() {
     statusText.textContent = "Dictionary loaded. Click 'Get next guess' to begin.";
     remainingCountEl.textContent = `Remaining words: ${bank.getWordList().length}`;
     nextGuessBtn.disabled = false;
+    if (useManualGuessBtn) {
+      useManualGuessBtn.disabled = false;
+    }
     renderCandidates();
   } catch (e) {
     console.error(e);
@@ -339,6 +344,8 @@ async function loadDictionary() {
 
 nextGuessBtn.addEventListener("click", () => {
   if (!processor) return;
+  // Always allow a fresh suggestion, discarding any previous unsued guess
+  processor.guess = null;
   currentGuess = processor.nextGuess();
   if (!currentGuess) {
     statusText.textContent = "No words available. Unable to guess.";
@@ -349,6 +356,38 @@ nextGuessBtn.addEventListener("click", () => {
   renderFeedbackControls();
   applyFeedbackBtn.disabled = false;
 });
+
+function setCurrentGuessFromWord(wordStr) {
+  const word = Word5.makeWord(wordStr.trim());
+  if (!word) {
+    statusText.textContent = "Please enter a valid 5-letter word.";
+    return;
+  }
+  currentGuess = word;
+  processor.guess = currentGuess;
+  statusText.textContent = "Provide feedback for this guess.";
+  renderGuess();
+  renderFeedbackControls();
+  applyFeedbackBtn.disabled = false;
+}
+
+if (useManualGuessBtn) {
+  useManualGuessBtn.addEventListener("click", () => {
+    if (!processor) return;
+    const value = manualGuessInput.value || "";
+    setCurrentGuessFromWord(value);
+  });
+}
+
+if (manualGuessInput) {
+  manualGuessInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!processor) return;
+      setCurrentGuessFromWord(manualGuessInput.value || "");
+    }
+  });
+}
 
 applyFeedbackBtn.addEventListener("click", () => {
   if (!processor || !currentGuess) return;
