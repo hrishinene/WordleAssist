@@ -216,7 +216,8 @@ class WordProcessor {
 
 const statusText = document.getElementById("statusText");
 const remainingCountEl = document.getElementById("remainingCount");
-const nextGuessBtn = document.getElementById("nextGuessBtn");
+const hardGuessBtn = document.getElementById("hardGuessBtn");
+const softGuessBtn = document.getElementById("softGuessBtn");
 const guessWordEl = document.getElementById("guessWord");
 const feedbackGrid = document.getElementById("feedbackGrid");
 const applyFeedbackBtn = document.getElementById("applyFeedbackBtn");
@@ -227,8 +228,17 @@ const useManualGuessBtn = document.getElementById("useManualGuessBtn");
 let bank = null;
 let processor = null;
 let currentGuess = null;
+let allWords = [];
 
 let feedbackState = ["X", "X", "X", "X", "X"]; // default to X
+let usedLetters = new Set();
+
+function addGuessLettersToUsed(word) {
+  if (!word) return;
+  for (const ch of word.alphabet) {
+    usedLetters.add(String(ch).toUpperCase());
+  }
+}
 
 function renderGuess() {
   guessWordEl.innerHTML = "";
@@ -327,11 +337,14 @@ async function loadDictionary() {
       .map((w) => w.trim())
       .filter((w) => w.length === 5);
 
+    allWords = words;
     bank = new WordBank(words);
     processor = new WordProcessor(bank);
-    statusText.textContent = "Dictionary loaded. Click 'Get next guess' to begin.";
+    statusText.textContent =
+      "Dictionary loaded. Choose Hard mode, Soft mode, or type your own word.";
     remainingCountEl.textContent = `Remaining words: ${bank.getWordList().length}`;
-    nextGuessBtn.disabled = false;
+    if (hardGuessBtn) hardGuessBtn.disabled = false;
+    if (softGuessBtn) softGuessBtn.disabled = false;
     if (useManualGuessBtn) {
       useManualGuessBtn.disabled = false;
     }
@@ -342,20 +355,59 @@ async function loadDictionary() {
   }
 }
 
-nextGuessBtn.addEventListener("click", () => {
-  if (!processor) return;
-  // Always allow a fresh suggestion, discarding any previous unsued guess
-  processor.guess = null;
-  currentGuess = processor.nextGuess();
-  if (!currentGuess) {
-    statusText.textContent = "No words available. Unable to guess.";
-    return;
+if (hardGuessBtn) {
+  hardGuessBtn.addEventListener("click", () => {
+    if (!processor) return;
+    // Fresh hard-mode suggestion from remaining valid candidates
+    processor.guess = null;
+    currentGuess = processor.nextGuess();
+    if (!currentGuess) {
+      statusText.textContent = "No words available. Unable to guess.";
+      return;
+    }
+    addGuessLettersToUsed(currentGuess);
+    statusText.textContent = "Provide feedback for this Hard mode guess.";
+    renderGuess();
+    renderFeedbackControls();
+    applyFeedbackBtn.disabled = false;
+  });
+}
+
+function pickSoftWord() {
+  if (!allWords || allWords.length === 0) return null;
+  const candidates = allWords.filter((w) => {
+    const up = w.toUpperCase();
+    if (up.length !== 5) return false;
+    for (const ch of up) {
+      if (usedLetters.has(ch)) return false;
+    }
+    return true;
+  });
+  if (candidates.length === 0) {
+    return null;
   }
-  statusText.textContent = "Provide feedback for this guess.";
-  renderGuess();
-  renderFeedbackControls();
-  applyFeedbackBtn.disabled = false;
-});
+  const idx = Math.floor(Math.random() * candidates.length);
+  return new Word5(candidates[idx]);
+}
+
+if (softGuessBtn) {
+  softGuessBtn.addEventListener("click", () => {
+    if (!processor) return;
+    const word = pickSoftWord();
+    if (!word) {
+      statusText.textContent =
+        "No unused-letter words remain for Soft mode. Try Hard mode or type your own.";
+      return;
+    }
+    currentGuess = word;
+    processor.guess = currentGuess;
+    addGuessLettersToUsed(currentGuess);
+    statusText.textContent = "Provide feedback for this Soft mode guess.";
+    renderGuess();
+    renderFeedbackControls();
+    applyFeedbackBtn.disabled = false;
+  });
+}
 
 function setCurrentGuessFromWord(wordStr) {
   const word = Word5.makeWord(wordStr.trim());
@@ -365,6 +417,7 @@ function setCurrentGuessFromWord(wordStr) {
   }
   currentGuess = word;
   processor.guess = currentGuess;
+   addGuessLettersToUsed(currentGuess);
   statusText.textContent = "Provide feedback for this guess.";
   renderGuess();
   renderFeedbackControls();
@@ -401,14 +454,16 @@ applyFeedbackBtn.addEventListener("click", () => {
   if (processor.isSolved()) {
     statusText.textContent = "Solved! All letters are in correct positions.";
     applyFeedbackBtn.disabled = true;
-    nextGuessBtn.disabled = true;
+    if (hardGuessBtn) hardGuessBtn.disabled = true;
+    if (softGuessBtn) softGuessBtn.disabled = true;
     return;
   }
 
   if (bank.isEmpty()) {
     statusText.textContent = "No candidates remain. The answer may be outside the dictionary.";
     applyFeedbackBtn.disabled = true;
-    nextGuessBtn.disabled = true;
+    if (hardGuessBtn) hardGuessBtn.disabled = true;
+    if (softGuessBtn) softGuessBtn.disabled = true;
     return;
   }
 
