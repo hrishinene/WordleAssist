@@ -231,15 +231,13 @@ let currentGuess = null;
 let allWords = [];
 
 let feedbackState = ["X", "X", "X", "X", "X"]; // default to X
-let usedLetters = new Set();
-let presentLetters = new Set(); // letters confirmed to exist (C or I in feedback)
-
-function addGuessLettersToUsed(word) {
-  if (!word) return;
-  for (const ch of word.alphabet) {
-    usedLetters.add(String(ch).toUpperCase());
-  }
-}
+// Tracking across attempts with confirmed feedback
+let triedLetters = new Set();       // all letters from words where feedback was provided
+let presentLetters = new Set();     // letters confirmed to exist (C or I in feedback)
+let correctLetters = new Set();     // letters confirmed correct at some position (C)
+let absentLetters = new Set();      // letters confirmed absent (only X feedback)
+// For soft mode: track indices that are known wrong for a letter (from 'I' feedback)
+const incorrectPositionsByLetter = new Map(); // key: uppercase letter, value: Set of indices
 
 function renderGuess() {
   guessWordEl.innerHTML = "";
@@ -318,14 +316,30 @@ function buildPredicatesFromFeedback() {
   currentGuess.alphabet.forEach((ch, idx) => {
     const code = feedbackState[idx];
     const up = String(ch).toUpperCase();
+    // Any letter that we have feedback for counts as "tried" for soft-mode elimination rules
+    triedLetters.add(up);
     if (code === "X") {
       predicates.push(new CharBasedEliminator(ch));
+      // Only mark absent if we have no evidence it's present
+      if (!presentLetters.has(up)) {
+        absentLetters.add(up);
+      }
     } else if (code === "C") {
       predicates.push(new PositionalKeeper(idx, ch));
       presentLetters.add(up);
+      correctLetters.add(up);
+      // A C overrides any prior assumption of absence
+      absentLetters.delete(up);
     } else if (code === "I") {
       predicates.push(new DisPositionalKeeper(idx, ch));
       presentLetters.add(up);
+      // An I also means the letter is present somewhere
+      absentLetters.delete(up);
+      // Remember that this letter cannot be at this index
+      if (!incorrectPositionsByLetter.has(up)) {
+        incorrectPositionsByLetter.set(up, new Set());
+      }
+      incorrectPositionsByLetter.get(up).add(idx);
     }
   });
   return predicates;
@@ -369,7 +383,6 @@ if (hardGuessBtn) {
       statusText.textContent = "No words available. Unable to guess.";
       return;
     }
-    addGuessLettersToUsed(currentGuess);
     statusText.textContent = "Provide feedback for this Hard mode guess.";
     renderGuess();
     renderFeedbackControls();
@@ -382,9 +395,21 @@ function pickSoftWord() {
   const candidates = allWords.filter((w) => {
     const up = w.toUpperCase();
     if (up.length !== 5) return false;
-    for (const ch of up) {
-      // Disallow letters that have been used before *unless* they are known-present
-      if (usedLetters.has(ch) && !presentLetters.has(ch)) return false;
+    // 1) All alphabets must be different
+    const uniq = new Set(up);
+    if (uniq.size !== 5) return false;
+
+    for (let i = 0; i < up.length; i++) {
+      const ch = up[i];
+      // 2) Do not use any alphabet that is already identified at right location
+      if (correctLetters.has(ch)) return false;
+      // Also avoid letters known to be absent from the word
+      if (absentLetters.has(ch)) return false;
+      // Prefer truly new letters: if tried before and not confirmed present, skip
+      if (triedLetters.has(ch) && !presentLetters.has(ch)) return false;
+      // 3) Do not use any positionally incorrect alphabet at the same position
+      const badPositions = incorrectPositionsByLetter.get(ch);
+      if (badPositions && badPositions.has(i)) return false;
     }
     return true;
   });
@@ -406,7 +431,6 @@ if (softGuessBtn) {
     }
     currentGuess = word;
     processor.guess = currentGuess;
-    addGuessLettersToUsed(currentGuess);
     statusText.textContent = "Provide feedback for this Soft mode guess.";
     renderGuess();
     renderFeedbackControls();
@@ -422,7 +446,6 @@ function setCurrentGuessFromWord(wordStr) {
   }
   currentGuess = word;
   processor.guess = currentGuess;
-   addGuessLettersToUsed(currentGuess);
   statusText.textContent = "Provide feedback for this guess.";
   renderGuess();
   renderFeedbackControls();

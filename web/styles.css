@@ -27,8 +27,8 @@ body {
 
 .app {
   width: 100%;
-  max-width: 960px;
-  padding: 24px 16px 40px;
+  max-width: 1200px;
+  padding: 24px 24px 40px;
 }
 
 header {
