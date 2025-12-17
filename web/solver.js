@@ -232,6 +232,7 @@ let allWords = [];
 
 let feedbackState = ["X", "X", "X", "X", "X"]; // default to X
 let usedLetters = new Set();
+let presentLetters = new Set(); // letters confirmed to exist (C or I in feedback)
 
 function addGuessLettersToUsed(word) {
   if (!word) return;
@@ -316,12 +317,15 @@ function buildPredicatesFromFeedback() {
   const predicates = [];
   currentGuess.alphabet.forEach((ch, idx) => {
     const code = feedbackState[idx];
+    const up = String(ch).toUpperCase();
     if (code === "X") {
       predicates.push(new CharBasedEliminator(ch));
     } else if (code === "C") {
       predicates.push(new PositionalKeeper(idx, ch));
+      presentLetters.add(up);
     } else if (code === "I") {
       predicates.push(new DisPositionalKeeper(idx, ch));
+      presentLetters.add(up);
     }
   });
   return predicates;
@@ -379,7 +383,8 @@ function pickSoftWord() {
     const up = w.toUpperCase();
     if (up.length !== 5) return false;
     for (const ch of up) {
-      if (usedLetters.has(ch)) return false;
+      // Disallow letters that have been used before *unless* they are known-present
+      if (usedLetters.has(ch) && !presentLetters.has(ch)) return false;
     }
     return true;
   });
