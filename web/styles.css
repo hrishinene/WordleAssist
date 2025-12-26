@@ -165,8 +165,45 @@ button:disabled {
 
 .guess-word {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.guess-word-tiles {
+  display: flex;
   justify-content: center;
   gap: 8px;
+}
+
+.word-with-tooltip {
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: help;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease-out;
+}
+
+.word-with-tooltip:hover {
+  color: var(--accent);
+}
+
+.dictionary-tooltip {
+  position: fixed;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-width: 400px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+  pointer-events: none;
+  word-wrap: break-word;
 }
 
 .tile {

@@ -239,15 +239,115 @@ let absentLetters = new Set();      // letters confirmed absent (only X feedback
 // For soft mode: track indices that are known wrong for a letter (from 'I' feedback)
 const incorrectPositionsByLetter = new Map(); // key: uppercase letter, value: Set of indices
 
+let definitionCache = new Map();
+let currentTooltip = null;
+let tooltipTimeout = null;
+
+async function fetchDefinition(word) {
+  const wordLower = word.toLowerCase();
+  if (definitionCache.has(wordLower)) {
+    return definitionCache.get(wordLower);
+  }
+  
+  try {
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordLower}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    if (data && data.length > 0 && data[0].meanings && data[0].meanings.length > 0) {
+      const meaning = data[0].meanings[0];
+      const definition = meaning.definitions && meaning.definitions.length > 0
+        ? meaning.definitions[0].definition
+        : null;
+      definitionCache.set(wordLower, definition);
+      return definition;
+    }
+    return null;
+  } catch (e) {
+    console.error("Failed to fetch definition:", e);
+    return null;
+  }
+}
+
+function showTooltip(element, word) {
+  if (currentTooltip) {
+    currentTooltip.remove();
+    currentTooltip = null;
+  }
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout);
+  }
+  
+  tooltipTimeout = setTimeout(async () => {
+    const definition = await fetchDefinition(word);
+    if (!definition) return;
+    
+    const tooltip = document.createElement("div");
+    tooltip.className = "dictionary-tooltip";
+    tooltip.textContent = definition;
+    document.body.appendChild(tooltip);
+    currentTooltip = tooltip;
+    
+    const rect = element.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let left = rect.left + rect.width / 2;
+    let top = rect.bottom + 8;
+    
+    // Keep tooltip on screen (calculate after tooltip is rendered)
+    if (left + tooltipRect.width / 2 > window.innerWidth) {
+      left = window.innerWidth - tooltipRect.width / 2 - 16;
+    }
+    if (left - tooltipRect.width / 2 < 0) {
+      left = tooltipRect.width / 2 + 16;
+    }
+    if (top + tooltipRect.height > window.innerHeight) {
+      top = rect.top - tooltipRect.height - 8;
+    }
+    
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+    tooltip.style.transform = "translateX(-50%)";
+  }, 300); // Small delay to avoid flickering
+}
+
+function hideTooltip() {
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout);
+    tooltipTimeout = null;
+  }
+  if (currentTooltip) {
+    currentTooltip.remove();
+    currentTooltip = null;
+  }
+}
+
 function renderGuess() {
+  hideTooltip(); // Clear any existing tooltip
   guessWordEl.innerHTML = "";
   if (!currentGuess) return;
+  const tilesContainer = document.createElement("div");
+  tilesContainer.className = "guess-word-tiles";
   for (const ch of currentGuess.alphabet) {
     const div = document.createElement("div");
     div.className = "tile";
     div.textContent = ch;
-    guessWordEl.appendChild(div);
+    tilesContainer.appendChild(div);
   }
+  guessWordEl.appendChild(tilesContainer);
+  
+  // Add hoverable word container for tooltip
+  const wordContainer = document.createElement("div");
+  wordContainer.className = "word-with-tooltip";
+  wordContainer.textContent = currentGuess.string.toLowerCase();
+  wordContainer.title = "Hover to see definition";
+  wordContainer.addEventListener("mouseenter", () => {
+    showTooltip(wordContainer, currentGuess.string);
+  });
+  wordContainer.addEventListener("mouseleave", () => {
+    hideTooltip();
+  });
+  guessWordEl.appendChild(wordContainer);
 }
 
 function renderCandidates() {
@@ -442,6 +542,13 @@ function setCurrentGuessFromWord(wordStr) {
   const word = Word5.makeWord(wordStr.trim());
   if (!word) {
     statusText.textContent = "Please enter a valid 5-letter word.";
+    return;
+  }
+  // Check if word exists in dictionary
+  const wordLower = word.string.toLowerCase();
+  const exists = allWords.some((w) => w.trim().toLowerCase() === wordLower);
+  if (!exists) {
+    statusText.textContent = `"${word.string}" is not in the dictionary. Please try another word.`;
     return;
   }
   currentGuess = word;
