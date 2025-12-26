@@ -286,6 +286,7 @@ function showTooltip(element, word) {
     const tooltip = document.createElement("div");
     tooltip.className = "dictionary-tooltip";
     tooltip.textContent = definition;
+    tooltip.setAttribute("role", "tooltip");
     document.body.appendChild(tooltip);
     currentTooltip = tooltip;
     
@@ -322,6 +323,141 @@ function hideTooltip() {
   }
 }
 
+function buildPredicatesForFeedbackPattern(word, feedbackPattern) {
+  // feedbackPattern is an array of 5 codes: ['X', 'C', 'I', ...]
+  const predicates = [];
+  word.alphabet.forEach((ch, idx) => {
+    const code = feedbackPattern[idx];
+    if (code === "X") {
+      predicates.push(new CharBasedEliminator(ch));
+    } else if (code === "C") {
+      predicates.push(new PositionalKeeper(idx, ch));
+    } else if (code === "I") {
+      predicates.push(new DisPositionalKeeper(idx, ch));
+    }
+  });
+  return predicates;
+}
+
+function calculateWordPower(word, wordBank) {
+  if (!word || !wordBank || wordBank.isEmpty()) return 0;
+  
+  const N = wordBank.getWordList().length;
+  if (N === 0) return 0;
+  
+  // Generate all possible feedback combinations (3^5 = 243)
+  const feedbackCodes = ["X", "C", "I"];
+  const allCombinations = [];
+  
+  function generateCombinations(pattern, depth) {
+    if (depth === 5) {
+      allCombinations.push([...pattern]);
+      return;
+    }
+    for (const code of feedbackCodes) {
+      pattern[depth] = code;
+      generateCombinations(pattern, depth + 1);
+    }
+  }
+  
+  generateCombinations([], 0);
+  
+  // For each combination, calculate eliminations
+  let totalEliminations = 0;
+  const numPatterns = allCombinations.length;
+  const eliminations = []; // Store all eliminations for debugging
+  let validPatterns = 0; // Count patterns that don't eliminate everything
+  
+  console.log(`\n=== Calculating Power for word: ${word.string} ===`);
+  console.log(`N (initial word count): ${N}`);
+  console.log(`Number of feedback patterns: ${numPatterns}`);
+  
+  for (let i = 0; i < allCombinations.length; i++) {
+    const feedbackPattern = allCombinations[i];
+    
+    // Create predicates for this feedback pattern
+    const predicates = buildPredicatesForFeedbackPattern(word, feedbackPattern);
+    
+    // Create a copy of the word bank to test
+    const testBank = new WordBank(
+      wordBank.getWordList().map((w) => w.string)
+    );
+    
+    // Apply predicates (using the same logic as WordProcessor.getPredicates)
+    const sortedPredicates = [...predicates].sort((a, b) => {
+      if (a.getPriority() === b.getPriority()) return 0;
+      return a.getPriority() > b.getPriority() ? 1 : -1;
+    });
+    
+    const chars = [];
+    const finalPredicates = [];
+    for (const p of sortedPredicates) {
+      if (p instanceof CharBasedEliminator && chars.includes(p.getChar())) {
+        continue;
+      }
+      finalPredicates.push(p);
+      chars.push(p.getChar());
+    }
+    
+    testBank.reduce(finalPredicates);
+    
+    const remaining = testBank.getWordList().length;
+    const eliminated = N - remaining;
+    
+    // Only consider patterns that don't eliminate all words (remaining > 0)
+    if (remaining > 0) {
+      eliminations.push(eliminated);
+      totalEliminations += eliminated;
+      validPatterns++;
+      
+      // Log first 10 and last 10 valid patterns for debugging
+      if (validPatterns <= 10 || validPatterns > eliminations.length - 10) {
+        console.log(`Pattern ${i + 1} [${feedbackPattern.join('')}]: n${validPatterns} = ${eliminated}, remaining = ${remaining}`);
+      }
+    } else {
+      // Log skipped patterns
+      if (i < 10 || i >= numPatterns - 10) {
+        console.log(`Pattern ${i + 1} [${feedbackPattern.join('')}]: SKIPPED (eliminated all, remaining = 0)`);
+      }
+    }
+  }
+  
+  // Log summary statistics
+  console.log(`\nElimination statistics:`);
+  console.log(`Valid patterns (remaining > 0): ${validPatterns} out of ${numPatterns}`);
+  console.log(`Total eliminations (sum): ${totalEliminations}`);
+  if (validPatterns > 0) {
+    console.log(`Average elimination: ${(totalEliminations / validPatterns).toFixed(2)}`);
+    console.log(`Min elimination: ${Math.min(...eliminations)}`);
+    console.log(`Max elimination: ${Math.max(...eliminations)}`);
+    if (eliminations.length > 0) {
+      const showCount = Math.min(20, eliminations.length);
+      console.log(`First ${showCount} eliminations: [${eliminations.slice(0, showCount).join(', ')}]`);
+      if (eliminations.length > showCount) {
+        console.log(`Last ${showCount} eliminations: [${eliminations.slice(-showCount).join(', ')}]`);
+      }
+    }
+  }
+  
+  // Strategy C: 100 * (min(n)) / N
+  // Power = minimum elimination across all valid patterns, as percentage
+  if (validPatterns === 0) {
+    console.log(`Power calculation: No valid patterns (all eliminate everything), returning 0`);
+    console.log(`=== End Power Calculation ===\n`);
+    return 0;
+  }
+  
+  const minElimination = Math.min(...eliminations);
+  const power = (100 * minElimination) / N;
+  
+  console.log(`\nPower calculation (Strategy C - Minimum):`);
+  console.log(`Minimum elimination: ${minElimination}`);
+  console.log(`Power: 100 * ${minElimination} / ${N} = ${power.toFixed(2)}%`);
+  console.log(`=== End Power Calculation ===\n`);
+  
+  return power;
+}
+
 function renderGuess() {
   hideTooltip(); // Clear any existing tooltip
   guessWordEl.innerHTML = "";
@@ -336,16 +472,32 @@ function renderGuess() {
   }
   guessWordEl.appendChild(tilesContainer);
   
+  // Calculate and display word power (Strategy C - Minimum)
+  if (bank && !bank.isEmpty()) {
+    const power = calculateWordPower(currentGuess, bank);
+    const powerDisplay = document.createElement("div");
+    powerDisplay.className = "word-power";
+    powerDisplay.textContent = `Power: ${power.toFixed(1)}%`;
+    guessWordEl.appendChild(powerDisplay);
+  }
+  
   // Add hoverable word container for tooltip
   const wordContainer = document.createElement("div");
   wordContainer.className = "word-with-tooltip";
   wordContainer.textContent = currentGuess.string.toLowerCase();
-  wordContainer.title = "Hover to see definition";
+  wordContainer.title = "";
   wordContainer.addEventListener("mouseenter", () => {
     showTooltip(wordContainer, currentGuess.string);
   });
   wordContainer.addEventListener("mouseleave", () => {
     hideTooltip();
+  });
+  wordContainer.addEventListener("click", () => {
+    window.open(
+      `https://www.merriam-webster.com/dictionary/${currentGuess.string.toLowerCase()}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   });
   guessWordEl.appendChild(wordContainer);
 }

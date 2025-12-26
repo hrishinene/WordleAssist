@@ -176,10 +176,17 @@ button:disabled {
   gap: 8px;
 }
 
+.word-power {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
 .word-with-tooltip {
   font-size: 0.9rem;
   color: var(--muted);
-  cursor: help;
+  cursor: pointer;
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 4px;
