@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hrishinene.github.io/WordleAssist/web/sitemap.xml

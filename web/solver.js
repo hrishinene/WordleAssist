@@ -218,6 +218,7 @@ const statusText = document.getElementById("statusText");
 const remainingCountEl = document.getElementById("remainingCount");
 const hardGuessBtn = document.getElementById("hardGuessBtn");
 const softGuessBtn = document.getElementById("softGuessBtn");
+const powerWordBtn = document.getElementById("powerWordBtn");
 const guessWordEl = document.getElementById("guessWord");
 const feedbackGrid = document.getElementById("feedbackGrid");
 const applyFeedbackBtn = document.getElementById("applyFeedbackBtn");
@@ -615,6 +616,7 @@ async function loadDictionary() {
     remainingCountEl.textContent = `Remaining words: ${bank.getWordList().length}`;
     if (hardGuessBtn) hardGuessBtn.disabled = false;
     if (softGuessBtn) softGuessBtn.disabled = false;
+    if (powerWordBtn) powerWordBtn.disabled = false;
     if (useManualGuessBtn) {
       useManualGuessBtn.disabled = false;
     }
@@ -642,8 +644,8 @@ if (hardGuessBtn) {
   });
 }
 
-function pickSoftWord() {
-  if (!allWords || allWords.length === 0) return null;
+function getAllSoftWordCandidates() {
+  if (!allWords || allWords.length === 0) return [];
   const candidates = allWords.filter((w) => {
     const up = w.toUpperCase();
     if (up.length !== 5) return false;
@@ -665,11 +667,70 @@ function pickSoftWord() {
     }
     return true;
   });
+  return candidates.map((w) => new Word5(w));
+}
+
+function pickSoftWord() {
+  const candidates = getAllSoftWordCandidates();
   if (candidates.length === 0) {
     return null;
   }
   const idx = Math.floor(Math.random() * candidates.length);
-  return new Word5(candidates[idx]);
+  return candidates[idx];
+}
+
+function pickPowerWord() {
+  if (!bank || bank.isEmpty()) return null;
+  
+  // Check if it's the first attempt (no feedback constraints yet)
+  const isFirstAttempt = triedLetters.size === 0 && 
+                         presentLetters.size === 0 && 
+                         correctLetters.size === 0 && 
+                         absentLetters.size === 0 && 
+                         incorrectPositionsByLetter.size === 0;
+  
+  if (isFirstAttempt) {
+    // Default to SALET for first attempt (known to be a good starting word)
+    console.log(`\n=== First Attempt: Using default Power Word SALET ===\n`);
+    const salet = Word5.makeWord("SALET");
+    if (salet) {
+      return salet;
+    }
+  }
+  
+  const softCandidates = getAllSoftWordCandidates();
+  if (softCandidates.length === 0) {
+    return null;
+  }
+  
+  console.log(`\n=== Finding Power Word ===`);
+  console.log(`Evaluating ${softCandidates.length} soft word candidates...`);
+  
+  let bestWord = null;
+  let bestPower = -1;
+  
+  // Calculate power for each candidate
+  for (let i = 0; i < softCandidates.length; i++) {
+    const word = softCandidates[i];
+    const power = calculateWordPower(word, bank);
+    
+    if (power > bestPower) {
+      bestPower = power;
+      bestWord = word;
+    }
+    
+    // Log progress for first few and last few
+    if (i < 5 || i >= softCandidates.length - 5) {
+      console.log(`Candidate ${i + 1}/${softCandidates.length}: ${word.string} - Power: ${power.toFixed(2)}%`);
+    }
+  }
+  
+  if (bestWord) {
+    console.log(`\nBest Power Word: ${bestWord.string} with Power: ${bestPower.toFixed(2)}%`);
+    console.log(`=== End Power Word Search ===\n`);
+  }
+  
+  return bestWord;
 }
 
 if (softGuessBtn) {
@@ -687,6 +748,32 @@ if (softGuessBtn) {
     renderGuess();
     renderFeedbackControls();
     applyFeedbackBtn.disabled = false;
+  });
+}
+
+if (powerWordBtn) {
+  powerWordBtn.addEventListener("click", () => {
+    if (!processor) return;
+    statusText.textContent = "Calculating power for soft words...";
+    powerWordBtn.disabled = true; // Disable while calculating
+    
+    // Use setTimeout to allow UI to update before heavy computation
+    setTimeout(() => {
+      const word = pickPowerWord();
+      if (!word) {
+        statusText.textContent =
+          "No soft words available for power calculation. Try Hard mode or type your own.";
+        powerWordBtn.disabled = false;
+        return;
+      }
+      currentGuess = word;
+      processor.guess = currentGuess;
+      statusText.textContent = "Provide feedback for this Power word guess.";
+      renderGuess();
+      renderFeedbackControls();
+      applyFeedbackBtn.disabled = false;
+      powerWordBtn.disabled = false;
+    }, 10);
   });
 }
 
@@ -738,21 +825,23 @@ applyFeedbackBtn.addEventListener("click", () => {
   bank.reduce(predicates);
   renderCandidates();
 
-  if (processor.isSolved()) {
-    statusText.textContent = "Solved! All letters are in correct positions.";
-    applyFeedbackBtn.disabled = true;
-    if (hardGuessBtn) hardGuessBtn.disabled = true;
-    if (softGuessBtn) softGuessBtn.disabled = true;
-    return;
-  }
+    if (processor.isSolved()) {
+      statusText.textContent = "Solved! All letters are in correct positions.";
+      applyFeedbackBtn.disabled = true;
+      if (hardGuessBtn) hardGuessBtn.disabled = true;
+      if (softGuessBtn) softGuessBtn.disabled = true;
+      if (powerWordBtn) powerWordBtn.disabled = true;
+      return;
+    }
 
-  if (bank.isEmpty()) {
-    statusText.textContent = "No candidates remain. The answer may be outside the dictionary.";
-    applyFeedbackBtn.disabled = true;
-    if (hardGuessBtn) hardGuessBtn.disabled = true;
-    if (softGuessBtn) softGuessBtn.disabled = true;
-    return;
-  }
+    if (bank.isEmpty()) {
+      statusText.textContent = "No candidates remain. The answer may be outside the dictionary.";
+      applyFeedbackBtn.disabled = true;
+      if (hardGuessBtn) hardGuessBtn.disabled = true;
+      if (softGuessBtn) softGuessBtn.disabled = true;
+      if (powerWordBtn) powerWordBtn.disabled = true;
+      return;
+    }
 
   // Prepare for next guess
   currentGuess = null;

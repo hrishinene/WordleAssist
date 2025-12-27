@@ -2,15 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WordleAssist Web</title>
+  <title>WordleAssist - Free Wordle Helper & Solver Tool | Browser-Based</title>
+  <meta name="description" content="Free Wordle helper and solver tool that runs entirely in your browser. Get smart word suggestions with power scoring, hard mode, and soft mode options. No backend required, completely private." />
+  <meta name="keywords" content="wordle helper, wordle solver, wordle assistant, wordle tool, wordle guess, wordle helper online, free wordle solver, wordle assistance" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://hrishinene.github.io/WordleAssist/web/" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hrishinene.github.io/WordleAssist/web/" />
+  <meta property="og:title" content="WordleAssist - Free Wordle Helper & Solver Tool" />
+  <meta property="og:description" content="Free Wordle helper that runs entirely in your browser. Get smart word suggestions with power scoring. Completely private, no backend required." />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:url" content="https://hrishinene.github.io/WordleAssist/web/" />
+  <meta property="twitter:title" content="WordleAssist - Free Wordle Helper & Solver Tool" />
+  <meta property="twitter:description" content="Free Wordle helper that runs entirely in your browser. Get smart word suggestions with power scoring. Completely private, no backend required." />
+  
+  <!-- Structured Data for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "WordleAssist",
+    "description": "Free Wordle helper and solver tool that runs entirely in your browser. Get smart word suggestions with power scoring, hard mode, and soft mode options.",
+    "url": "https://hrishinene.github.io/WordleAssist/web/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Hard mode word suggestions",
+      "Soft mode word suggestions",
+      "Power word scoring",
+      "Dictionary lookup",
+      "Browser-based (no backend)",
+      "Completely private"
+    ]
+  }
+  </script>
+  
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app">
     <header>
-      <h1>WordleAssist</h1>
-      <p>Wordle helper running entirely in your browser.</p>
+      <h1>WordleAssist - Free Wordle Helper & Solver</h1>
+      <p>Wordle helper running entirely in your browser. Get smart word suggestions with power scoring, hard mode, and soft mode options. Completely private - no data sent to servers.</p>
     </header>
 
     <main>
@@ -24,6 +67,7 @@
           <div class="guess-buttons-row">
             <button id="hardGuessBtn" disabled>Hard mode word</button>
             <button id="softGuessBtn" disabled>Soft mode word</button>
+            <button id="powerWordBtn" disabled>Power word</button>
           </div>
           <div class="manual-guess">
             <label for="manualGuessInput">or type your guess:</label>
