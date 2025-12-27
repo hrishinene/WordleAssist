@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>How to Use WordleAssist - Step-by-Step Guide</title>
+  <meta name="description" content="Learn how to use WordleAssist, a free Wordle helper tool. Complete step-by-step guide with examples." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      color: #f9fafb;
+      background: radial-gradient(circle at top, #1f2937, #020617 55%);
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .container {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85));
+      border-radius: 14px;
+      border: 1px solid #1f2933;
+      padding: 40px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+    }
+    
+    h1 {
+      color: #4ade80;
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+    }
+    
+    .subtitle {
+      color: #9ca3af;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    
+    h2 {
+      color: #4ade80;
+      margin-top: 40px;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      border-bottom: 2px solid #4ade80;
+      padding-bottom: 10px;
+    }
+    
+    h3 {
+      color: #fbbf24;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+    
+    p {
+      margin-bottom: 15px;
+      color: #e5e7eb;
+    }
+    
+    .step {
+      background: rgba(15, 23, 42, 0.6);
+      border-left: 4px solid #4ade80;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    
+    .step-number {
+      display: inline-block;
+      background: #4ade80;
+      color: #022c22;
+      font-weight: bold;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-right: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .feature-box {
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+    
+    .feature-box h4 {
+      color: #4ade80;
+      margin-bottom: 8px;
+    }
+    
+    ul, ol {
+      margin-left: 25px;
+      margin-bottom: 15px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+      color: #e5e7eb;
+    }
+    
+    code {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fbbf24;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .button-demo {
+      display: inline-block;
+      background: #4ade80;
+      color: #022c22;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin: 5px;
+    }
+    
+    .example {
+      background: rgba(251, 191, 36, 0.1);
+      border-left: 4px solid #fbbf24;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+    
+    .example-title {
+      color: #fbbf24;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #4ade80;
+      color: #022c22;
+      text-decoration: none;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    
+    .back-link:hover {
+      transform: translateY(-2px);
+    }
+    
+    .tip {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+    
+    .tip-title {
+      color: #3b82f6;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>How to Use WordleAssist</h1>
+    <p class="subtitle">A complete step-by-step guide to using the Wordle helper tool</p>
+    
+    <h2>Quick Start</h2>
+    <p>WordleAssist is a free browser-based tool that helps you solve Wordle puzzles by suggesting optimal words based on your feedback. It runs entirely in your browser - no data is sent to any server.</p>
+    
+    <div class="step">
+      <span class="step-number">Step 1</span>
+      <strong>Open WordleAssist</strong>
+      <p>Navigate to the WordleAssist web app in your browser. The dictionary will load automatically (you'll see "Dictionary loaded" message).</p>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">Step 2</span>
+      <strong>Start Your First Guess</strong>
+      <p>Click one of the word suggestion buttons:</p>
+      <ul>
+        <li><span class="button-demo">Power word</span> - Best starting word (defaults to SALET for first attempt)</li>
+        <li><span class="button-demo">Hard mode word</span> - Word from remaining valid candidates</li>
+        <li><span class="button-demo">Soft mode word</span> - Word using unused letters</li>
+      </ul>
+      <p>Or type your own 5-letter word in the input field and click "Use".</p>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">Step 3</span>
+      <strong>Enter Your Guess in Wordle</strong>
+      <p>Copy the suggested word and enter it in your Wordle game (on NYTimes, Wordle.com, or any Wordle-like game).</p>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">Step 4</span>
+      <strong>Provide Feedback in WordleAssist</strong>
+      <p>After entering your guess in Wordle, you'll see color-coded feedback. Translate this to WordleAssist:</p>
+      <ul>
+        <li><strong>Gray/Black</strong> → Click <code>X</code> (letter not in word)</li>
+        <li><strong>Green</strong> → Click <code>C</code> (letter in correct position)</li>
+        <li><strong>Yellow</strong> → Click <code>I</code> (letter in word but wrong position)</li>
+      </ul>
+      <p>Do this for all 5 letters of your guess.</p>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">Step 5</span>
+      <strong>Apply Feedback</strong>
+      <p>Click the <span class="button-demo">Apply feedback</span> button. WordleAssist will update the remaining word list based on your feedback.</p>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">Step 6</span>
+      <strong>Repeat Until Solved</strong>
+      <p>Get your next suggestion, enter it in Wordle, provide feedback, and repeat until you solve the puzzle!</p>
+    </div>
+    
+    <h2>Understanding the Features</h2>
+    
+    <div class="feature-box">
+      <h4>🎯 Hard Mode Word</h4>
+      <p>Suggests words from the remaining valid candidates that satisfy all your previous feedback constraints. These words will always be valid guesses that match everything you've learned so far.</p>
+    </div>
+    
+    <div class="feature-box">
+      <h4>🔤 Soft Mode Word</h4>
+      <p>Suggests words that use letters you haven't tried yet (or letters known to be present but in wrong positions). This helps you explore new letter combinations and gather more information. Soft mode words:</p>
+      <ul>
+        <li>Use only unique letters (no duplicates)</li>
+        <li>Avoid letters already confirmed at correct positions</li>
+        <li>Avoid letters known to be absent</li>
+        <li>Can reuse letters that are present but in wrong positions (at different positions)</li>
+      </ul>
+    </div>
+    
+    <div class="feature-box">
+      <h4>⚡ Power Word</h4>
+      <p>Finds the soft word with the highest power score. The power score (0-100%) indicates how effective a word is at eliminating possibilities, even in worst-case scenarios. Higher power = better word choice.</p>
+      <p><strong>Note:</strong> For the first attempt, Power Word defaults to "SALET" (a known optimal starting word) to save calculation time.</p>
+    </div>
+    
+    <div class="feature-box">
+      <h4>📊 Power Score</h4>
+      <p>Each suggested word displays a Power score. This shows the minimum percentage of words that would be eliminated even if you get the worst possible feedback. A higher power score means the word is more effective at narrowing down possibilities.</p>
+    </div>
+    
+    <div class="feature-box">
+      <h4>🔍 Dictionary Lookup</h4>
+      <p><strong>Hover</strong> over any suggested word (the underlined text below the letter tiles) to see its definition in a tooltip.</p>
+      <p><strong>Click</strong> on any suggested word to open it in Merriam-Webster dictionary in a new tab.</p>
+    </div>
+    
+    <h2>Example Walkthrough</h2>
+    
+    <div class="example">
+      <div class="example-title">Example: Solving a Wordle Puzzle</div>
+      <ol>
+        <li><strong>First Guess:</strong> Click "Power word" → Get "SALET"</li>
+        <li><strong>Enter in Wordle:</strong> Type "SALET"</li>
+        <li><strong>Wordle Feedback:</strong> S (gray), A (yellow), L (gray), E (green), T (gray)</li>
+        <li><strong>WordleAssist Feedback:</strong> 
+          <ul>
+            <li>Position 1 (S): Click <code>X</code></li>
+            <li>Position 2 (A): Click <code>I</code></li>
+            <li>Position 3 (L): Click <code>X</code></li>
+            <li>Position 4 (E): Click <code>C</code></li>
+            <li>Position 5 (T): Click <code>X</code></li>
+          </ul>
+        </li>
+        <li><strong>Apply Feedback:</strong> Click "Apply feedback" button</li>
+        <li><strong>Result:</strong> Word list reduces from ~12,975 to a smaller set</li>
+        <li><strong>Next Guess:</strong> Click "Hard mode word" or "Power word" for next suggestion</li>
+        <li><strong>Repeat:</strong> Continue until solved!</li>
+      </ol>
+    </div>
+    
+    <h2>Tips & Best Practices</h2>
+    
+    <div class="tip">
+      <div class="tip-title">💡 Tip 1: Start with Power Word</div>
+      <p>For your first guess, always use "Power word" to get the optimal starting word (SALET). This word is specifically chosen for its high elimination power.</p>
+    </div>
+    
+    <div class="tip">
+      <div class="tip-title">💡 Tip 2: Use Hard Mode for Narrowing Down</div>
+      <p>Once you have some feedback, "Hard mode word" is great for finding words that match all your constraints and help you zero in on the answer.</p>
+    </div>
+    
+    <div class="tip">
+      <div class="tip-title">💡 Tip 3: Use Soft Mode to Explore</div>
+      <p>If you're stuck or want to try different letter combinations, "Soft mode word" helps you explore new letters while respecting what you already know.</p>
+    </div>
+    
+    <div class="tip">
+      <div class="tip-title">💡 Tip 4: Check Word Meanings</div>
+      <p>Hover over words to see their definitions. This helps ensure you're guessing valid English words and can help you understand the suggestions better.</p>
+    </div>
+    
+    <div class="tip">
+      <div class="tip-title">💡 Tip 5: Watch the Remaining Count</div>
+      <p>The "Remaining words" counter shows how many valid candidates are left. As it gets smaller, you're getting closer to the answer!</p>
+    </div>
+    
+    <h2>Frequently Asked Questions</h2>
+    
+    <h3>Q: Is WordleAssist free to use?</h3>
+    <p><strong>A:</strong> Yes! WordleAssist is completely free and open source.</p>
+    
+    <h3>Q: Does WordleAssist send my data to any server?</h3>
+    <p><strong>A:</strong> No! Everything runs in your browser. No data is sent to any server - it's completely private.</p>
+    
+    <h3>Q: Can I use WordleAssist on mobile?</h3>
+    <p><strong>A:</strong> Yes! WordleAssist is responsive and works on mobile devices, tablets, and desktops.</p>
+    
+    <h3>Q: What's the difference between Hard Mode and Soft Mode?</h3>
+    <p><strong>A:</strong> Hard Mode suggests words that match all your constraints. Soft Mode suggests words using unused letters to help you explore new possibilities.</p>
+    
+    <h3>Q: Why does Power Word take time to calculate?</h3>
+    <p><strong>A:</strong> Power Word calculates the elimination power for all soft word candidates. For the first attempt, it defaults to SALET to save time. Subsequent calculations may take a few seconds depending on how many candidates there are.</p>
+    
+    <h3>Q: Can I enter words not in the dictionary?</h3>
+    <p><strong>A:</strong> WordleAssist validates that manually entered words exist in the dictionary. If a word isn't found, you'll see an error message.</p>
+    
+    <h3>Q: What if I make a mistake entering feedback?</h3>
+    <p><strong>A:</strong> You can click "Get next guess" again to get a new suggestion without applying feedback. Or you can simply get a new suggestion and provide the correct feedback.</p>
+    
+    <h2>Need Help?</h2>
+    <p>If you encounter any issues or have questions:</p>
+    <ul>
+      <li>Check the browser console (F12) for any error messages</li>
+      <li>Make sure you're using a modern browser (Chrome, Firefox, Safari, Edge)</li>
+      <li>Ensure JavaScript is enabled</li>
+      <li>Visit the <a href="https://github.com/hrishinene/WordleAssist" style="color: #4ade80;">GitHub repository</a> for more information</li>
+    </ul>
+    
+    <a href="index.html" class="back-link">← Back to WordleAssist</a>
+  </div>
+</body>
+</html>
