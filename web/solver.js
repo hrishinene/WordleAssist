@@ -699,19 +699,77 @@ function pickPowerWord() {
   }
   
   const softCandidates = getAllSoftWordCandidates();
-  if (softCandidates.length === 0) {
-    return null;
+  const remainingWords = bank.getWordList();
+  const remainingCount = remainingWords.length;
+  
+  // Build set of soft candidate strings for fast lookup
+  const softCandidateStrings = new Set(softCandidates.map(w => w.string));
+  
+  // Collect all candidates for power calculation
+  let allCandidates = [...softCandidates];
+  let additionalCandidatesCount = 0;
+  
+  // If soft words < 10 AND remaining words < 20, include additional words
+  if (softCandidates.length < 10 && remainingCount < 20) {
+    // Extract unique letters from remaining words
+    const remainingLetters = new Set();
+    for (const word of remainingWords) {
+      for (const ch of word.alphabet) {
+        remainingLetters.add(ch);
+      }
+    }
+    
+    console.log(`\n=== Finding Power Word ===`);
+    console.log(`Soft candidates: ${softCandidates.length}, Remaining words: ${remainingCount}`);
+    console.log(`Condition met: Adding additional candidates with at least 2 letters from remaining words`);
+    console.log(`Unique letters in remaining words: ${Array.from(remainingLetters).sort().join('')}`);
+    
+    // Find words from allWords that:
+    // - Are NOT soft candidates
+    // - Contain at least 2 letters from remaining words
+    for (const wordStr of allWords) {
+      const up = wordStr.toUpperCase().trim();
+      if (up.length !== 5) continue;
+      
+      // Skip if it's already a soft candidate
+      if (softCandidateStrings.has(up)) continue;
+      
+      // Count how many letters from this word are in the remaining letters set
+      const wordLetters = new Set(up);
+      let matchingLetters = 0;
+      for (const ch of wordLetters) {
+        if (remainingLetters.has(ch)) {
+          matchingLetters++;
+        }
+      }
+      
+      // Include if at least 2 letters match
+      if (matchingLetters >= 2) {
+        const word = Word5.makeWord(up);
+        if (word) {
+          allCandidates.push(word);
+          additionalCandidatesCount++;
+        }
+      }
+    }
+    
+    console.log(`Added ${additionalCandidatesCount} additional candidates (not soft words)`);
+    console.log(`Total candidates for power calculation: ${allCandidates.length}`);
+  } else {
+    console.log(`\n=== Finding Power Word ===`);
+    console.log(`Evaluating ${softCandidates.length} soft word candidates...`);
   }
   
-  console.log(`\n=== Finding Power Word ===`);
-  console.log(`Evaluating ${softCandidates.length} soft word candidates...`);
+  if (allCandidates.length === 0) {
+    return null;
+  }
   
   let bestWord = null;
   let bestPower = -1;
   
   // Calculate power for each candidate
-  for (let i = 0; i < softCandidates.length; i++) {
-    const word = softCandidates[i];
+  for (let i = 0; i < allCandidates.length; i++) {
+    const word = allCandidates[i];
     const power = calculateWordPower(word, bank);
     
     if (power > bestPower) {
@@ -720,13 +778,15 @@ function pickPowerWord() {
     }
     
     // Log progress for first few and last few
-    if (i < 5 || i >= softCandidates.length - 5) {
-      console.log(`Candidate ${i + 1}/${softCandidates.length}: ${word.string} - Power: ${power.toFixed(2)}%`);
+    if (i < 5 || i >= allCandidates.length - 5) {
+      const candidateType = softCandidateStrings.has(word.string) ? "soft" : "additional";
+      console.log(`Candidate ${i + 1}/${allCandidates.length} [${candidateType}]: ${word.string} - Power: ${power.toFixed(2)}%`);
     }
   }
   
   if (bestWord) {
-    console.log(`\nBest Power Word: ${bestWord.string} with Power: ${bestPower.toFixed(2)}%`);
+    const bestType = softCandidateStrings.has(bestWord.string) ? "soft" : "additional";
+    console.log(`\nBest Power Word: ${bestWord.string} [${bestType}] with Power: ${bestPower.toFixed(2)}%`);
     console.log(`=== End Power Word Search ===\n`);
   }
   
